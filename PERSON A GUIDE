@@ -1,0 +1,109 @@
+📘 GUIDE 1: FOR PERSON A (UI DESIGNER)
+Hey! You're going to make the app look beautiful. Here's exactly what to do.
+
+🚀 STEP 1: Get the Code
+Go to the GitHub link your project leader sent
+
+Click the green "Code" button
+
+Click "Download ZIP"
+
+Extract the folder to your Desktop
+
+💻 STEP 2: Open Terminal
+Open the extracted folder
+
+Click in the address bar at the top
+
+Type cmd and press Enter
+
+A black window opens - this is your terminal
+
+📦 STEP 3: Install Everything
+In the black terminal window, type these commands ONE BY ONE:
+
+text
+pip install streamlit
+pip install opencv-python
+pip install mediapipe
+pip install scikit-learn
+pip install pandas
+pip install numpy
+pip install Pillow
+Wait for each one to finish before typing the next.
+
+🧪 STEP 4: Test the App
+Type this in the terminal:
+
+text
+streamlit run app.py
+If a browser opens with the app, you're ready to start!
+
+To stop the app: Press Ctrl + C
+
+🎨 STEP 5: Your Tasks
+Open app.py in Notepad (right-click → Open with → Notepad)
+
+Task 1: Add a Sidebar
+Find this line:
+
+text
+st.title("🎨 AI Personal Color Analysis")
+Copy and paste this RIGHT AFTER it:
+
+text
+with st.sidebar:
+    st.markdown("## About This App")
+    st.markdown("This AI analyzes your skin undertone")
+    st.markdown("---")
+    st.markdown("### How to Use")
+    st.markdown("1. Upload a photo")
+    st.markdown("2. Wait for analysis")
+    st.markdown("3. Get recommendations")
+    st.markdown("---")
+    st.markdown("Made with ❤️ by Team AI")
+Task 2: Add Download Button
+Scroll to the very bottom of the file. Find this line:
+
+text
+st.markdown('</div>', unsafe_allow_html=True)
+Copy and paste this RIGHT BEFORE that line:
+
+text
+    st.download_button(
+        label="Download My Report",
+        data=f"Undertone: {prediction}",
+        file_name="my_report.txt"
+    )
+Task 3: Add Loading Animation
+Find this line:
+
+text
+if image is not None:
+Change it to:
+
+text
+if image is not None:
+    with st.spinner("Analyzing... Please wait!"):
+Important: Everything after this line must have spaces in front. Select all code below and press the Tab key once.
+
+✅ STEP 6: Save and Test
+Save the file (Ctrl + S)
+
+In terminal, run: streamlit run app.py
+
+Test with a photo
+
+Make sure sidebar appears and button works
+
+📤 STEP 7: Send Back Your Work
+Find app.py in your folder
+
+Right-click → Send to → Compressed (zipped) folder
+
+Send the ZIP file to your project leader
+
+🆘 If Something Breaks
+Undo your last change and test again
+
+Ask your project leader for help
