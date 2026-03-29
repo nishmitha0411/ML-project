@@ -1,0 +1,115 @@
+📘 GUIDE 2: FOR PERSON B (FEATURE DEVELOPER)
+Hey! You're going to add useful features to the app. Here's exactly what to do.
+
+🚀 STEP 1: Get the Code
+Go to the GitHub link your project leader sent
+
+Click the green "Code" button
+
+Click "Download ZIP"
+
+Extract the folder to your Desktop
+
+💻 STEP 2: Open Terminal
+Open the extracted folder
+
+Click in the address bar at the top
+
+Type cmd and press Enter
+
+A black window opens - this is your terminal
+
+📦 STEP 3: Install Everything
+In the black terminal window, type these commands ONE BY ONE:
+
+text
+pip install streamlit
+pip install opencv-python
+pip install mediapipe
+pip install scikit-learn
+pip install pandas
+pip install numpy
+pip install Pillow
+Wait for each one to finish before typing the next.
+
+🧪 STEP 4: Test the App
+Type this in the terminal:
+
+text
+streamlit run app.py
+If a browser opens with the app, you're ready to start!
+
+To stop the app: Press Ctrl + C
+
+⚙️ STEP 5: Your Tasks
+Open app.py in Notepad (right-click → Open with → Notepad)
+
+Task 1: Add Image Quality Checker
+First, scroll to the very top of the file. Find the line that says:
+
+text
+import warnings
+Copy and paste this RIGHT AFTER it:
+
+text
+def check_image_quality(image_array):
+    brightness = np.mean(image_array)
+    if brightness < 50:
+        return False, "Image too dark"
+    if brightness > 220:
+        return False, "Image too bright"
+    return True, "Good quality"
+Second, find this line:
+
+text
+img_array = cv2.cvtColor(img_array, cv2.COLOR_RGB2BGR)
+Copy and paste this RIGHT AFTER it:
+
+text
+    quality_ok, message = check_image_quality(img_array)
+    if not quality_ok:
+        st.error(message)
+        st.stop()
+    else:
+        st.success(message)
+Task 2: Add Color Palette
+First, scroll to the top again (where you added the first function). Add this RIGHT AFTER it:
+
+text
+def get_palette(undertone):
+    if undertone == "Warm":
+        return ["Coral", "Mustard", "Olive"]
+    elif undertone == "Cool":
+        return ["Royal Blue", "Lavender", "Rose"]
+    else:
+        return ["Soft Gray", "Ivory", "Dusty Blue"]
+Second, find this line:
+
+text
+st.subheader("🎨 Your Color Palette")
+Copy and paste this RIGHT AFTER it:
+
+text
+    colors = get_palette(prediction)
+    for color in colors:
+        st.write(f"- {color}")
+✅ STEP 6: Save and Test
+Save the file (Ctrl + S)
+
+In terminal, run: streamlit run app.py
+
+Test with a photo
+
+Check if:
+
+Image quality message appears
+
+Color list shows up
+
+📤 STEP 7: Send Back Your Work
+Find app.py in your folder
+
+Right-click → Send to → Compressed (zipped) folder
+
+Send the ZIP file to your team
+
