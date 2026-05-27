@@ -569,6 +569,22 @@ def ita_undertone(r, g, b):
     if ita<10: return "Cool"
     return "Neutral"
 
+def detect_face(img_bgr):
+    """Detect if a face exists in the image using Haar Cascade.
+    Returns (face_found: bool, face_count: int, face_rect: tuple or None)
+    """
+    h, w = img_bgr.shape[:2]
+    gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
+    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
+    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(60, 60))
+    
+    if len(faces) == 0:
+        return False, 0, None
+    
+    # Return largest face
+    largest_face = sorted(faces, key=lambda f: f[2]*f[3], reverse=True)[0]
+    return True, len(faces), largest_face
+
 def extract_landmarks(img_bgr):
     """Detect face with OpenCV Haar cascade and sample skin pixels."""
     h, w = img_bgr.shape[:2]
@@ -1023,6 +1039,24 @@ if mode == "📸 Single photo":
         if cam: image = Image.open(cam)
 
     if image:
+        # First, validate that a face exists in the image
+        img_bgr = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+        face_found, face_count, face_rect = detect_face(img_bgr)
+        
+        if not face_found:
+            st.error("❌ **No face detected!**")
+            st.markdown("""<div class="card" style="background:#fff4f0;border-left:4px solid #e05050;padding:12px 16px;margin-top:12px">
+            <div style="color:#a05040;font-weight:600;margin-bottom:8px">Please check:</div>
+            <ul style="color:#a05040;margin:0;padding-left:20px">
+            <li>Is your face clearly visible and front-facing?</li>
+            <li>Is the photo in good natural lighting (no shadows on face)?</li>
+            <li>Is your face taking up a reasonable portion of the frame?</li>
+            <li>Try removing glasses or hats that might obscure your face.</li>
+            </ul>
+            </div>""", unsafe_allow_html=True)
+            st.stop()
+        
+        # Face detected, proceed with full analysis
         with st.spinner("Analysing…"):
             res, status, qs = analyse(image)
         render_quality_banner(qs)
@@ -1054,9 +1088,37 @@ elif mode == "🎞️ Multi-photo (more accurate)":
 
         if len(files) >= 2:
             images = [Image.open(f) for f in files]
+            
+            # Validate that all photos contain faces
+            face_validation_results = []
+            for i, img in enumerate(images):
+                img_bgr = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
+                face_found, face_count, _ = detect_face(img_bgr)
+                face_validation_results.append((i, face_found, face_count))
+            
+            # Show results
             cols = st.columns(len(images))
             for i, (col, img) in enumerate(zip(cols, images)):
-                with col: st.image(img, use_container_width=True, caption=f"Photo {i+1}")
+                with col:
+                    _, face_found, face_count = face_validation_results[i]
+                    status_icon = "✅" if face_found else "❌"
+                    st.image(img, use_container_width=True, caption=f"Photo {i+1} {status_icon}")
+            
+            # Check if all photos have valid faces
+            all_have_faces = all(found for _, found, _ in face_validation_results)
+            invalid_photos = [i+1 for i, found, _ in face_validation_results if not found]
+            
+            if not all_have_faces:
+                st.error(f"❌ **No face detected in photo(s): {', '.join(map(str, invalid_photos))}**")
+                st.markdown("""<div class="card" style="background:#fff4f0;border-left:4px solid #e05050;padding:12px 16px;margin-top:12px">
+                <div style="color:#a05040;font-weight:600;margin-bottom:8px">Please re-upload with:</div>
+                <ul style="color:#a05040;margin:0;padding-left:20px">
+                <li>Your face clearly visible and front-facing</li>
+                <li>Good natural lighting (no shadows on face)</li>
+                <li>Your face taking up a reasonable portion of each frame</li>
+                </ul>
+                </div>""", unsafe_allow_html=True)
+                st.stop()
 
             with st.spinner(f"Averaging across {len(images)} photos…"):
                 res, status, qs = analyse_multi(images)
